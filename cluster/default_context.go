@@ -39,7 +39,7 @@ func (dcc *DefaultContext) Request(identity, kind string, message interface{}, o
 	var resp interface{}
 
 	var counter int
-	callConfig := DefaultGrainCallConfig(dcc.cluster)
+	callConfig := NewGrainCallOptions(dcc.cluster)
 	for _, o := range opts {
 		o(callConfig)
 	}

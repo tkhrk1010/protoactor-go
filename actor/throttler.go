@@ -23,7 +23,7 @@ const (
 func NewThrottle(maxEventsInPeriod int32, period time.Duration, throttledCallBack func(int32)) ShouldThrottle {
 	currentEvents := int32(0)
 
-	startTimer := func(duration time.Duration, back func(int32)) {
+	startTimer := func(duration time.Duration) {
 		go func() {
 			// crete ticker to mimic sleep, we do not want to put the goroutine to sleep
 			// as it will schedule it out of the P making a syscall, we just want it to
@@ -42,7 +42,7 @@ func NewThrottle(maxEventsInPeriod int32, period time.Duration, throttledCallBac
 	return func() Valve {
 		tries := atomic.AddInt32(&currentEvents, 1)
 		if tries == 1 {
-			startTimer(period, throttledCallBack)
+			startTimer(period)
 		}
 
 		if tries == maxEventsInPeriod {

@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2022 Asynkton AB All rights reserved
+// Copyright (C) 2017 - 2024 Asynkton AB All rights reserved
 
 package cluster
 

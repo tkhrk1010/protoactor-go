@@ -144,6 +144,7 @@ func (ga *GossipActor) onGossipRequest(r *GossipRequest, ctx actor.Context) {
 
 func (ga *GossipActor) onSetGossipStateKey(r *SetGossipStateKey, ctx actor.Context) {
 	key, message := r.Key, r.Value
+	ctx.Logger().Debug("Setting GossipState", slog.String("key", key), slog.Any("message", message))
 	ga.gossip.SetState(key, message)
 
 	if ctx.Sender() != nil {

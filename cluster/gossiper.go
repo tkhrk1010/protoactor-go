@@ -235,7 +235,6 @@ breakLoop:
 			g.cluster.Logger().Debug("Stopping Gossip Loop")
 			break breakLoop
 		case <-ticker.C:
-			g.cluster.Logger().Debug("Gossip Loop Tick")
 			g.blockExpiredHeartbeats()
 			g.blockGracefullyLeft()
 			g.SetState(HearthbeatKey, &MemberHeartbeat{

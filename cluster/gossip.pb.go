@@ -124,8 +124,8 @@ func (x *GossipResponse) GetState() *GossipState {
 	return nil
 }
 
-// two GossipState objects can be merged
-// key + member_id gets it's own entry, if collision, highest version is selected
+// string key is member id
+// GossipState is the state of that member
 type GossipState struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -173,6 +173,8 @@ func (x *GossipState) GetMembers() map[string]*GossipMemberState {
 	return nil
 }
 
+// string key is the key of the gossip value, e.g. "heartbeat"
+// GossipKeyValue is the value of that key
 type GossipMemberState struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

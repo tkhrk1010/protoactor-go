@@ -1230,6 +1230,155 @@ func (x *ActorStatistics) GetActorCount() map[string]int64 {
 	return nil
 }
 
+type ClusterReachability struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Reachable map[string]*MemberReachability `protobuf:"bytes,1,rep,name=reachable,proto3" json:"reachable,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+}
+
+func (x *ClusterReachability) Reset() {
+	*x = ClusterReachability{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cluster_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ClusterReachability) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClusterReachability) ProtoMessage() {}
+
+func (x *ClusterReachability) ProtoReflect() protoreflect.Message {
+	mi := &file_cluster_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClusterReachability.ProtoReflect.Descriptor instead.
+func (*ClusterReachability) Descriptor() ([]byte, []int) {
+	return file_cluster_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *ClusterReachability) GetReachable() map[string]*MemberReachability {
+	if x != nil {
+		return x.Reachable
+	}
+	return nil
+}
+
+type MemberReachability struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	LastContactTimestampUnixMilliseconds int64 `protobuf:"varint,1,opt,name=last_contact_timestamp_unix_milliseconds,json=lastContactTimestampUnixMilliseconds,proto3" json:"last_contact_timestamp_unix_milliseconds,omitempty"`
+}
+
+func (x *MemberReachability) Reset() {
+	*x = MemberReachability{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cluster_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MemberReachability) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MemberReachability) ProtoMessage() {}
+
+func (x *MemberReachability) ProtoReflect() protoreflect.Message {
+	mi := &file_cluster_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MemberReachability.ProtoReflect.Descriptor instead.
+func (*MemberReachability) Descriptor() ([]byte, []int) {
+	return file_cluster_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *MemberReachability) GetLastContactTimestampUnixMilliseconds() int64 {
+	if x != nil {
+		return x.LastContactTimestampUnixMilliseconds
+	}
+	return 0
+}
+
+type ClusterLeader struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ProposedLeaderMemberId string `protobuf:"bytes,1,opt,name=proposed_leader_member_id,json=proposedLeaderMemberId,proto3" json:"proposed_leader_member_id,omitempty"` // we propose this node becomes leader
+	ElectedLeaderMemberId  string `protobuf:"bytes,2,opt,name=elected_leader_member_id,json=electedLeaderMemberId,proto3" json:"elected_leader_member_id,omitempty"`    // this is the leader we have elected earlier
+}
+
+func (x *ClusterLeader) Reset() {
+	*x = ClusterLeader{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cluster_proto_msgTypes[21]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ClusterLeader) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClusterLeader) ProtoMessage() {}
+
+func (x *ClusterLeader) ProtoReflect() protoreflect.Message {
+	mi := &file_cluster_proto_msgTypes[21]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClusterLeader.ProtoReflect.Descriptor instead.
+func (*ClusterLeader) Descriptor() ([]byte, []int) {
+	return file_cluster_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *ClusterLeader) GetProposedLeaderMemberId() string {
+	if x != nil {
+		return x.ProposedLeaderMemberId
+	}
+	return ""
+}
+
+func (x *ClusterLeader) GetElectedLeaderMemberId() string {
+	if x != nil {
+		return x.ElectedLeaderMemberId
+	}
+	return ""
+}
+
 type IdentityHandoverRequest_Topology struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1242,7 +1391,7 @@ type IdentityHandoverRequest_Topology struct {
 func (x *IdentityHandoverRequest_Topology) Reset() {
 	*x = IdentityHandoverRequest_Topology{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cluster_proto_msgTypes[19]
+		mi := &file_cluster_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1255,7 +1404,7 @@ func (x *IdentityHandoverRequest_Topology) String() string {
 func (*IdentityHandoverRequest_Topology) ProtoMessage() {}
 
 func (x *IdentityHandoverRequest_Topology) ProtoReflect() protoreflect.Message {
-	mi := &file_cluster_proto_msgTypes[19]
+	mi := &file_cluster_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1297,7 +1446,7 @@ type PackedActivations_Kind struct {
 func (x *PackedActivations_Kind) Reset() {
 	*x = PackedActivations_Kind{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cluster_proto_msgTypes[20]
+		mi := &file_cluster_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1310,7 +1459,7 @@ func (x *PackedActivations_Kind) String() string {
 func (*PackedActivations_Kind) ProtoMessage() {}
 
 func (x *PackedActivations_Kind) ProtoReflect() protoreflect.Message {
-	mi := &file_cluster_proto_msgTypes[20]
+	mi := &file_cluster_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1352,7 +1501,7 @@ type PackedActivations_Activation struct {
 func (x *PackedActivations_Activation) Reset() {
 	*x = PackedActivations_Activation{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cluster_proto_msgTypes[21]
+		mi := &file_cluster_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1365,7 +1514,7 @@ func (x *PackedActivations_Activation) String() string {
 func (*PackedActivations_Activation) ProtoMessage() {}
 
 func (x *PackedActivations_Activation) ProtoReflect() protoreflect.Message {
-	mi := &file_cluster_proto_msgTypes[21]
+	mi := &file_cluster_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1579,10 +1728,37 @@ var file_cluster_proto_rawDesc = []byte{
 	0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
 	0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38,
-	0x01, 0x42, 0x2c, 0x5a, 0x2a, 0x2f, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
-	0x2f, 0x61, 0x73, 0x79, 0x6e, 0x6b, 0x72, 0x6f, 0x6e, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x61,
-	0x63, 0x74, 0x6f, 0x72, 0x2d, 0x67, 0x6f, 0x2f, 0x63, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x01, 0x22, 0xbb, 0x01, 0x0a, 0x13, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x61,
+	0x63, 0x68, 0x61, 0x62, 0x69, 0x6c, 0x69, 0x74, 0x79, 0x12, 0x49, 0x0a, 0x09, 0x72, 0x65, 0x61,
+	0x63, 0x68, 0x61, 0x62, 0x6c, 0x65, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x2b, 0x2e, 0x63,
+	0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x2e, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65,
+	0x61, 0x63, 0x68, 0x61, 0x62, 0x69, 0x6c, 0x69, 0x74, 0x79, 0x2e, 0x52, 0x65, 0x61, 0x63, 0x68,
+	0x61, 0x62, 0x6c, 0x65, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x09, 0x72, 0x65, 0x61, 0x63, 0x68,
+	0x61, 0x62, 0x6c, 0x65, 0x1a, 0x59, 0x0a, 0x0e, 0x52, 0x65, 0x61, 0x63, 0x68, 0x61, 0x62, 0x6c,
+	0x65, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x31, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75,
+	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x63, 0x6c, 0x75, 0x73, 0x74, 0x65,
+	0x72, 0x2e, 0x4d, 0x65, 0x6d, 0x62, 0x65, 0x72, 0x52, 0x65, 0x61, 0x63, 0x68, 0x61, 0x62, 0x69,
+	0x6c, 0x69, 0x74, 0x79, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22,
+	0x6c, 0x0a, 0x12, 0x4d, 0x65, 0x6d, 0x62, 0x65, 0x72, 0x52, 0x65, 0x61, 0x63, 0x68, 0x61, 0x62,
+	0x69, 0x6c, 0x69, 0x74, 0x79, 0x12, 0x56, 0x0a, 0x28, 0x6c, 0x61, 0x73, 0x74, 0x5f, 0x63, 0x6f,
+	0x6e, 0x74, 0x61, 0x63, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x5f,
+	0x75, 0x6e, 0x69, 0x78, 0x5f, 0x6d, 0x69, 0x6c, 0x6c, 0x69, 0x73, 0x65, 0x63, 0x6f, 0x6e, 0x64,
+	0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x24, 0x6c, 0x61, 0x73, 0x74, 0x43, 0x6f, 0x6e,
+	0x74, 0x61, 0x63, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x55, 0x6e, 0x69,
+	0x78, 0x4d, 0x69, 0x6c, 0x6c, 0x69, 0x73, 0x65, 0x63, 0x6f, 0x6e, 0x64, 0x73, 0x22, 0x83, 0x01,
+	0x0a, 0x0d, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x4c, 0x65, 0x61, 0x64, 0x65, 0x72, 0x12,
+	0x39, 0x0a, 0x19, 0x70, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65, 0x64, 0x5f, 0x6c, 0x65, 0x61, 0x64,
+	0x65, 0x72, 0x5f, 0x6d, 0x65, 0x6d, 0x62, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x16, 0x70, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65, 0x64, 0x4c, 0x65, 0x61, 0x64,
+	0x65, 0x72, 0x4d, 0x65, 0x6d, 0x62, 0x65, 0x72, 0x49, 0x64, 0x12, 0x37, 0x0a, 0x18, 0x65, 0x6c,
+	0x65, 0x63, 0x74, 0x65, 0x64, 0x5f, 0x6c, 0x65, 0x61, 0x64, 0x65, 0x72, 0x5f, 0x6d, 0x65, 0x6d,
+	0x62, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x15, 0x65, 0x6c,
+	0x65, 0x63, 0x74, 0x65, 0x64, 0x4c, 0x65, 0x61, 0x64, 0x65, 0x72, 0x4d, 0x65, 0x6d, 0x62, 0x65,
+	0x72, 0x49, 0x64, 0x42, 0x2c, 0x5a, 0x2a, 0x2f, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63,
+	0x6f, 0x6d, 0x2f, 0x61, 0x73, 0x79, 0x6e, 0x6b, 0x72, 0x6f, 0x6e, 0x2f, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x61, 0x63, 0x74, 0x6f, 0x72, 0x2d, 0x67, 0x6f, 0x2f, 0x63, 0x6c, 0x75, 0x73, 0x74, 0x65,
+	0x72, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1598,7 +1774,7 @@ func file_cluster_proto_rawDescGZIP() []byte {
 }
 
 var file_cluster_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_cluster_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
+var file_cluster_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
 var file_cluster_proto_goTypes = []interface{}{
 	(IdentityHandoverAck_State)(0),           // 0: cluster.IdentityHandoverAck.State
 	(*IdentityHandoverRequest)(nil),          // 1: cluster.IdentityHandoverRequest
@@ -1620,41 +1796,47 @@ var file_cluster_proto_goTypes = []interface{}{
 	(*ClusterTopologyNotification)(nil),      // 17: cluster.ClusterTopologyNotification
 	(*MemberHeartbeat)(nil),                  // 18: cluster.MemberHeartbeat
 	(*ActorStatistics)(nil),                  // 19: cluster.ActorStatistics
-	(*IdentityHandoverRequest_Topology)(nil), // 20: cluster.IdentityHandoverRequest.Topology
-	(*PackedActivations_Kind)(nil),           // 21: cluster.PackedActivations.Kind
-	(*PackedActivations_Activation)(nil),     // 22: cluster.PackedActivations.Activation
-	nil,                                      // 23: cluster.ActorStatistics.ActorCountEntry
-	(*actor.PID)(nil),                        // 24: actor.PID
+	(*ClusterReachability)(nil),              // 20: cluster.ClusterReachability
+	(*MemberReachability)(nil),               // 21: cluster.MemberReachability
+	(*ClusterLeader)(nil),                    // 22: cluster.ClusterLeader
+	(*IdentityHandoverRequest_Topology)(nil), // 23: cluster.IdentityHandoverRequest.Topology
+	(*PackedActivations_Kind)(nil),           // 24: cluster.PackedActivations.Kind
+	(*PackedActivations_Activation)(nil),     // 25: cluster.PackedActivations.Activation
+	nil,                                      // 26: cluster.ActorStatistics.ActorCountEntry
+	nil,                                      // 27: cluster.ClusterReachability.ReachableEntry
+	(*actor.PID)(nil),                        // 28: actor.PID
 }
 var file_cluster_proto_depIdxs = []int32{
-	20, // 0: cluster.IdentityHandoverRequest.current_topology:type_name -> cluster.IdentityHandoverRequest.Topology
-	20, // 1: cluster.IdentityHandoverRequest.delta_topology:type_name -> cluster.IdentityHandoverRequest.Topology
+	23, // 0: cluster.IdentityHandoverRequest.current_topology:type_name -> cluster.IdentityHandoverRequest.Topology
+	23, // 1: cluster.IdentityHandoverRequest.delta_topology:type_name -> cluster.IdentityHandoverRequest.Topology
 	7,  // 2: cluster.IdentityHandover.actors:type_name -> cluster.Activation
 	4,  // 3: cluster.RemoteIdentityHandover.actors:type_name -> cluster.PackedActivations
-	21, // 4: cluster.PackedActivations.actors:type_name -> cluster.PackedActivations.Kind
+	24, // 4: cluster.PackedActivations.actors:type_name -> cluster.PackedActivations.Kind
 	0,  // 5: cluster.IdentityHandoverAck.processing_state:type_name -> cluster.IdentityHandoverAck.State
-	24, // 6: cluster.Activation.pid:type_name -> actor.PID
+	28, // 6: cluster.Activation.pid:type_name -> actor.PID
 	6,  // 7: cluster.Activation.cluster_identity:type_name -> cluster.ClusterIdentity
-	24, // 8: cluster.ActivationTerminating.pid:type_name -> actor.PID
+	28, // 8: cluster.ActivationTerminating.pid:type_name -> actor.PID
 	6,  // 9: cluster.ActivationTerminating.cluster_identity:type_name -> cluster.ClusterIdentity
-	24, // 10: cluster.ActivationTerminated.pid:type_name -> actor.PID
+	28, // 10: cluster.ActivationTerminated.pid:type_name -> actor.PID
 	6,  // 11: cluster.ActivationTerminated.cluster_identity:type_name -> cluster.ClusterIdentity
 	6,  // 12: cluster.ActivationRequest.cluster_identity:type_name -> cluster.ClusterIdentity
 	6,  // 13: cluster.ProxyActivationRequest.cluster_identity:type_name -> cluster.ClusterIdentity
-	24, // 14: cluster.ProxyActivationRequest.replaced_activation:type_name -> actor.PID
-	24, // 15: cluster.ActivationResponse.pid:type_name -> actor.PID
+	28, // 14: cluster.ProxyActivationRequest.replaced_activation:type_name -> actor.PID
+	28, // 15: cluster.ActivationResponse.pid:type_name -> actor.PID
 	15, // 16: cluster.ClusterTopology.members:type_name -> cluster.Member
 	15, // 17: cluster.ClusterTopology.joined:type_name -> cluster.Member
 	15, // 18: cluster.ClusterTopology.left:type_name -> cluster.Member
 	19, // 19: cluster.MemberHeartbeat.actor_statistics:type_name -> cluster.ActorStatistics
-	23, // 20: cluster.ActorStatistics.actor_count:type_name -> cluster.ActorStatistics.ActorCountEntry
-	15, // 21: cluster.IdentityHandoverRequest.Topology.members:type_name -> cluster.Member
-	22, // 22: cluster.PackedActivations.Kind.activations:type_name -> cluster.PackedActivations.Activation
-	23, // [23:23] is the sub-list for method output_type
-	23, // [23:23] is the sub-list for method input_type
-	23, // [23:23] is the sub-list for extension type_name
-	23, // [23:23] is the sub-list for extension extendee
-	0,  // [0:23] is the sub-list for field type_name
+	26, // 20: cluster.ActorStatistics.actor_count:type_name -> cluster.ActorStatistics.ActorCountEntry
+	27, // 21: cluster.ClusterReachability.reachable:type_name -> cluster.ClusterReachability.ReachableEntry
+	15, // 22: cluster.IdentityHandoverRequest.Topology.members:type_name -> cluster.Member
+	25, // 23: cluster.PackedActivations.Kind.activations:type_name -> cluster.PackedActivations.Activation
+	21, // 24: cluster.ClusterReachability.ReachableEntry.value:type_name -> cluster.MemberReachability
+	25, // [25:25] is the sub-list for method output_type
+	25, // [25:25] is the sub-list for method input_type
+	25, // [25:25] is the sub-list for extension type_name
+	25, // [25:25] is the sub-list for extension extendee
+	0,  // [0:25] is the sub-list for field type_name
 }
 
 func init() { file_cluster_proto_init() }
@@ -1892,7 +2074,7 @@ func file_cluster_proto_init() {
 			}
 		}
 		file_cluster_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*IdentityHandoverRequest_Topology); i {
+			switch v := v.(*ClusterReachability); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1904,7 +2086,7 @@ func file_cluster_proto_init() {
 			}
 		}
 		file_cluster_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*PackedActivations_Kind); i {
+			switch v := v.(*MemberReachability); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1916,6 +2098,42 @@ func file_cluster_proto_init() {
 			}
 		}
 		file_cluster_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ClusterLeader); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cluster_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*IdentityHandoverRequest_Topology); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cluster_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*PackedActivations_Kind); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cluster_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*PackedActivations_Activation); i {
 			case 0:
 				return &v.state
@@ -1934,7 +2152,7 @@ func file_cluster_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_cluster_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   23,
+			NumMessages:   27,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

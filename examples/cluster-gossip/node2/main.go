@@ -28,7 +28,7 @@ func main() {
 
 func coloredConsoleLogging(system *actor.ActorSystem) *slog.Logger {
 	return slog.New(tint.NewHandler(os.Stdout, &tint.Options{
-		Level:      slog.LevelError,
+		Level:      slog.LevelDebug,
 		TimeFormat: time.RFC3339,
 		AddSource:  true,
 	})).With("lib", "Proto.Actor").

@@ -6,7 +6,7 @@ require (
 	github.com/asynkron/goconsole v0.0.0-20160504192649-bfa12eebf716
 	google.golang.org/protobuf v1.31.0
 )
-
+replace github.com/asynkron/protoactor-go => ../..
 require github.com/asynkron/protoactor-go v0.0.0-20240406090656-8c90bda12e81
 
 require (

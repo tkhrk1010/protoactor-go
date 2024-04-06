@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/lmittmann/tint"
+	"os"
+	"time"
 
 	"cluster-gossip/shared"
 
@@ -11,6 +14,7 @@ import (
 	"github.com/asynkron/protoactor-go/cluster/clusterproviders/consul"
 	"github.com/asynkron/protoactor-go/cluster/identitylookup/disthash"
 	"github.com/asynkron/protoactor-go/remote"
+	"log/slog"
 )
 
 func main() {
@@ -22,8 +26,17 @@ func main() {
 	cluster.Shutdown(true)
 }
 
+func coloredConsoleLogging(system *actor.ActorSystem) *slog.Logger {
+	return slog.New(tint.NewHandler(os.Stdout, &tint.Options{
+		Level:      slog.LevelError,
+		TimeFormat: time.RFC3339,
+		AddSource:  true,
+	})).With("lib", "Proto.Actor").
+		With("system", system.ID)
+}
+
 func startNode() *cluster.Cluster {
-	system := actor.NewActorSystem()
+	system := actor.NewActorSystem(actor.WithLoggerFactory(coloredConsoleLogging))
 
 	provider, _ := consul.New()
 	lookup := disthash.New()

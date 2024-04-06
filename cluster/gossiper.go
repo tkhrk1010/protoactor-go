@@ -174,6 +174,7 @@ func (g *Gossiper) RegisterConsensusCheck(key string, getValue func(*anypb.Any) 
 
 func (g *Gossiper) StartGossiping() error {
 	var err error
+	g.cluster.Logger().Info("Starting gossip")
 	g.pid, err = g.cluster.ActorSystem.Root.SpawnNamed(actor.PropsFromProducerWithActorSystem(func(system *actor.ActorSystem) actor.Actor {
 		return NewGossipActor(
 			g.cluster.Config.GossipRequestTimeout,
@@ -221,7 +222,7 @@ func (g *Gossiper) Shutdown() {
 }
 
 func (g *Gossiper) gossipLoop() {
-	g.cluster.Logger().Info("Starting gossip loop")
+	g.cluster.Logger().Debug("Starting gossip loop")
 
 	// create a ticker that will tick each GossipInterval milliseconds
 	// we do not use sleep as sleep puts the goroutine out of the scheduler
@@ -231,17 +232,15 @@ breakLoop:
 	for !g.cluster.ActorSystem.IsStopped() {
 		select {
 		case <-g.close:
-			g.cluster.Logger().Info("Stopping Gossip Loop")
+			g.cluster.Logger().Debug("Stopping Gossip Loop")
 			break breakLoop
 		case <-ticker.C:
-
+			g.cluster.Logger().Debug("Gossip Loop Tick")
 			g.blockExpiredHeartbeats()
 			g.blockGracefullyLeft()
-
 			g.SetState(HearthbeatKey, &MemberHeartbeat{
-				// todo collect the actor statistics
 				ActorStatistics: &ActorStatistics{
-					ActorCount: GetActorCount(),
+					ActorCount: g.GetActorCount(),
 				},
 			})
 			g.SendState()
@@ -249,8 +248,15 @@ breakLoop:
 	}
 }
 
-func GetActorCount() map[string]int64 {
+func (g *Gossiper) GetActorCount() map[string]int64 {
 	m := make(map[string]int64)
+	clusterKinds := g.cluster.GetClusterKinds()
+	for _, kindName := range clusterKinds {
+		kind := g.cluster.GetClusterKind(kindName)
+		m[kindName] = int64(kind.count)
+	}
+	g.cluster.Logger().Debug("Actor Count", slog.Any("count", m))
+
 	return m
 }
 

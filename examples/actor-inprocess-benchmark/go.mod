@@ -2,7 +2,7 @@ module inprocessbenchmark
 
 go 1.21
 
-require github.com/asynkron/protoactor-go v0.0.0-20240116091649-93e384a26d0d
+require github.com/asynkron/protoactor-go v0.0.0-20240406090656-8c90bda12e81
 
 require (
 	github.com/Workiva/go-datastructures v1.1.1 // indirect

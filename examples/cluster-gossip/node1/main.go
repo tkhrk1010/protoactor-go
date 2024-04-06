@@ -46,7 +46,12 @@ func startNode() *cluster.Cluster {
 		case *cluster.ClusterTopology:
 			fmt.Printf("\nClusterTopology %v\n\n", msg)
 		case *cluster.GossipUpdate:
-			fmt.Printf("\nGossipUpdate %v\n\n", msg)
+
+			as := &cluster.ActorStatistics{}
+
+			if unpackErr := msg.Value.UnmarshalTo(as); unpackErr != nil {
+				fmt.Printf("\nActorStatistics %v\n\n", as)
+			}
 		}
 	})
 

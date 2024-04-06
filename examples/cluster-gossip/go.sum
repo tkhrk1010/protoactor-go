@@ -17,6 +17,8 @@ github.com/asynkron/gofun v0.0.0-20220329210725-34fed760f4c2 h1:jEsFZ9d/ieJGVrx3
 github.com/asynkron/gofun v0.0.0-20220329210725-34fed760f4c2/go.mod h1:5GMOSqaYxNWwuVRWyampTPJEntwz7Mj9J8v1a7gSU2E=
 github.com/asynkron/protoactor-go v0.0.0-20240116091649-93e384a26d0d h1:/hjPIUib6lReKTncaTIW6FMwO/2sa2Kgv9TCDODZDpo=
 github.com/asynkron/protoactor-go v0.0.0-20240116091649-93e384a26d0d/go.mod h1:4KJf8vAca0fX3EShIBwyY77HV8NldoO1RzFGNlNkjWA=
+github.com/asynkron/protoactor-go v0.0.0-20240406090656-8c90bda12e81 h1:n/hoTcXlJ24nczsq8KwJu/hwTiuwvLZ91+WBhcWJncc=
+github.com/asynkron/protoactor-go v0.0.0-20240406090656-8c90bda12e81/go.mod h1:kFxBmdgouTsJa56gCYYZBW+0NR3RFi+g55AvxQ5ye0g=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+CedLV8=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=

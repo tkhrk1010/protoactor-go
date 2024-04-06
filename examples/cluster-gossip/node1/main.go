@@ -45,6 +45,8 @@ func startNode() *cluster.Cluster {
 		switch msg := evt.(type) {
 		case *cluster.ClusterTopology:
 			fmt.Printf("\nClusterTopology %v\n\n", msg)
+		case *cluster.GossipUpdate:
+			fmt.Printf("\nGossipUpdate %v\n\n", msg)
 		}
 	})
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cluster-basic/shared"
+	"cluster-gossip/shared"
 	"fmt"
 	console "github.com/asynkron/goconsole"
 	"github.com/asynkron/protoactor-go/actor"

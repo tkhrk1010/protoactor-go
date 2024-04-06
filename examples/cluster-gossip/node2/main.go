@@ -1,8 +1,10 @@
 package main
 
 import (
-	"cluster-basic/shared"
 	"fmt"
+
+	"cluster-gossip/shared"
+
 	console "github.com/asynkron/goconsole"
 	"github.com/asynkron/protoactor-go/actor"
 	"github.com/asynkron/protoactor-go/cluster"
@@ -12,18 +14,12 @@ import (
 )
 
 func main() {
-	c := startNode()
+	cluster := startNode()
 
 	fmt.Print("\nBoot other nodes and press Enter\n")
 	console.ReadLine()
-	pid := c.Get("abc", "hello")
-	fmt.Printf("Got pid %v", pid)
-	res, _ := c.Request("abc", "hello", &shared.HelloRequest{Name: "Roger"})
-	fmt.Printf("Got response %v", res)
 
-	fmt.Println()
-	console.ReadLine()
-	c.Shutdown(true)
+	cluster.Shutdown(true)
 }
 
 func startNode() *cluster.Cluster {
@@ -32,9 +28,20 @@ func startNode() *cluster.Cluster {
 	provider, _ := consul.New()
 	lookup := disthash.New()
 	config := remote.Configure("localhost", 0)
-	clusterConfig := cluster.Configure("my-cluster", provider, lookup, config)
-	c := cluster.New(system, clusterConfig)
-	c.StartMember()
 
+	props := actor.PropsFromFunc(func(ctx actor.Context) {
+		switch msg := ctx.Message().(type) {
+		case *actor.Started:
+			fmt.Printf("Started %v", msg)
+		case *shared.HelloRequest:
+			fmt.Printf("Hello %v\n", msg.Name)
+			ctx.Respond(&shared.HelloResponse{})
+		}
+	})
+	helloKind := cluster.NewKind("hello", props)
+	clusterConfig := cluster.Configure("my-cluster", provider, lookup, config, cluster.WithKinds(helloKind))
+	c := cluster.New(system, clusterConfig)
+
+	c.StartMember()
 	return c
 }

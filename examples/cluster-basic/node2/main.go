@@ -33,8 +33,9 @@ func startNode() *cluster.Cluster {
 		switch msg := ctx.Message().(type) {
 		case *actor.Started:
 			fmt.Printf("Started %v", msg)
-		case *shared.Hello:
+		case *shared.HelloRequest:
 			fmt.Printf("Hello %v\n", msg.Name)
+			ctx.Respond(&shared.HelloResponse{})
 		}
 	})
 	helloKind := cluster.NewKind("hello", props)

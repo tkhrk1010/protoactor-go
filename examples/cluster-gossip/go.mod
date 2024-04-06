@@ -6,8 +6,13 @@ require (
 	github.com/asynkron/goconsole v0.0.0-20160504192649-bfa12eebf716
 	google.golang.org/protobuf v1.31.0
 )
+
 replace github.com/asynkron/protoactor-go => ../..
-require github.com/asynkron/protoactor-go v0.0.0-20240406090656-8c90bda12e81
+
+require (
+	github.com/asynkron/protoactor-go v0.0.0-20240406090656-8c90bda12e81
+	github.com/lmittmann/tint v1.0.3
+)
 
 require (
 	github.com/Workiva/go-datastructures v1.1.1 // indirect
@@ -32,7 +37,6 @@ require (
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/serf v0.10.1 // indirect
 	github.com/lithammer/shortuuid/v4 v4.0.0 // indirect
-	github.com/lmittmann/tint v1.0.3 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect

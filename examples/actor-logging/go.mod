@@ -9,6 +9,8 @@ require (
 	go.uber.org/zap v1.26.0
 )
 
+replace github.com/asynkron/protoactor-go => ../..
+
 require github.com/asynkron/protoactor-go v0.0.0-20240116091649-93e384a26d0d
 
 require (

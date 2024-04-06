@@ -48,6 +48,8 @@ func (p *placementActor) Receive(ctx actor.Context) {
 
 func (p *placementActor) onTerminated(msg *actor.Terminated) {
 	found, key, meta := p.pidToMeta(msg.Who)
+	clusterKind := p.cluster.GetClusterKind(meta.ID.Kind)
+	clusterKind.Dec()
 
 	activationTerminated := &clustering.ActivationTerminated{
 		Pid:             msg.Who,
@@ -98,6 +100,7 @@ func (p *placementActor) onActivationRequest(msg *clustering.ActivationRequest, 
 	props := clustering.WithClusterIdentity(clusterKind.Props, msg.ClusterIdentity)
 
 	pid := ctx.SpawnPrefix(props, msg.ClusterIdentity.Identity)
+	clusterKind.Inc()
 
 	p.actors[key] = GrainMeta{
 		ID:  msg.ClusterIdentity,

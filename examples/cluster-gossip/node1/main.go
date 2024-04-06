@@ -49,8 +49,13 @@ func startNode() *cluster.Cluster {
 
 			as := &cluster.ActorStatistics{}
 
+			fmt.Printf("Member %v\n", msg.MemberID)
 			if unpackErr := msg.Value.UnmarshalTo(as); unpackErr != nil {
-				fmt.Printf("\nActorStatistics %v\n\n", as)
+				//loop over as.ActorCount map
+				for k, v := range as.ActorCount {
+					fmt.Printf("ActorCount %v %v\n", k, v)
+				}
+
 			}
 		}
 	})

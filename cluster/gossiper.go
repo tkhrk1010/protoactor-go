@@ -240,11 +240,18 @@ breakLoop:
 
 			g.SetState(HearthbeatKey, &MemberHeartbeat{
 				// todo collect the actor statistics
-				ActorStatistics: &ActorStatistics{},
+				ActorStatistics: &ActorStatistics{
+					ActorCount: GetActorCount(),
+				},
 			})
 			g.SendState()
 		}
 	}
+}
+
+func GetActorCount() map[string]int64 {
+	m := make(map[string]int64)
+	return m
 }
 
 // blockExpiredHeartbeats blocks members that have not sent a heartbeat for a long time

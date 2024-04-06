@@ -47,18 +47,19 @@ func startNode() *cluster.Cluster {
 			fmt.Printf("\nClusterTopology %v\n\n", msg)
 		case *cluster.GossipUpdate:
 
-			as := &cluster.ActorStatistics{}
+			heartbeat := &cluster.MemberHeartbeat{}
 
 			fmt.Printf("Member %v\n", msg.MemberID)
 			fmt.Printf("Sequence Number %v\n", msg.SeqNumber)
-			if unpackErr := msg.Value.UnmarshalTo(as); unpackErr != nil {
+
+			unpackErr := msg.Value.UnmarshalTo(heartbeat)
+			if unpackErr != nil {
+				fmt.Printf("Unpack error %v\n", unpackErr)
+			} else {
 				//loop over as.ActorCount map
-				for k, v := range as.ActorCount {
+				for k, v := range heartbeat.ActorStatistics.ActorCount {
 					fmt.Printf("ActorCount %v %v\n", k, v)
 				}
-
-			} else {
-				fmt.Printf("Unpack error %v\n", unpackErr)
 			}
 		}
 	})

@@ -90,8 +90,8 @@ func (ga *GossipActor) onGossipRequest(r *GossipRequest, ctx actor.Context) {
 	}
 	ga.ReceiveState(r.State, ctx)
 
-	if !GetCluster(ctx.ActorSystem()).MemberList.ContainsMemberID(r.MemberId) {
-		ctx.Logger().Warn("Got gossip request from unknown member", slog.String("MemberId", r.MemberId))
+	if !GetCluster(ctx.ActorSystem()).MemberList.ContainsMemberID(r.FromMemberId) {
+		ctx.Logger().Warn("Got gossip request from unknown member", slog.String("MemberId", r.FromMemberId))
 
 		// nothing to send, do not provide sender or state payload
 		// ctx.Respond(&GossipResponse{State: &GossipState{Members: make(map[string]*GossipState_GossipMemberState)}})
@@ -100,9 +100,9 @@ func (ga *GossipActor) onGossipRequest(r *GossipRequest, ctx actor.Context) {
 		return
 	}
 
-	memberState := ga.gossip.GetMemberStateDelta(r.MemberId)
+	memberState := ga.gossip.GetMemberStateDelta(r.FromMemberId)
 	if !memberState.HasState {
-		ctx.Logger().Warn("Got gossip request from member, but no state was found", slog.String("MemberId", r.MemberId))
+		ctx.Logger().Warn("Got gossip request from member, but no state was found", slog.String("MemberId", r.FromMemberId))
 
 		// nothing to send, do not provide sender or state payload
 		ctx.Respond(&GossipResponse{})
@@ -177,8 +177,8 @@ func (ga *GossipActor) sendGossipForMember(member *Member, memberStateDelta *Mem
 	// for timeout, blocking other gossips from getting through
 
 	msg := GossipRequest{
-		MemberId: member.Id,
-		State:    memberStateDelta.State,
+		FromMemberId: member.Id,
+		State:        memberStateDelta.State,
 	}
 	future := ctx.RequestFuture(pid, &msg, ga.gossipRequestTimeout)
 

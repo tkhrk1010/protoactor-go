@@ -48,7 +48,7 @@ func newInformer(myID string, getBlockedMembers func() set.Set[string], fanOut i
 	informer := Informer{
 		myID: myID,
 		state: &GossipState{
-			Members: map[string]*GossipState_GossipMemberState{},
+			Members: map[string]*GossipMemberState{},
 		},
 		committedOffsets:  map[string]int64{},
 		activeMemberIDs:   map[string]empty{},
@@ -145,13 +145,13 @@ func (inf *Informer) GetMemberStateDelta(targetMemberID string) *MemberStateDelt
 	var count int
 
 	// newState will old the final new state to be sent
-	newState := GossipState{Members: make(map[string]*GossipState_GossipMemberState)}
+	newState := GossipState{Members: make(map[string]*GossipMemberState)}
 
 	// hashmaps in Go are random by nature so no need to randomize state.Members
 	pendingOffsets := inf.committedOffsets
 
 	// create a new map with gossipMaxSend entries max
-	members := make(map[string]*GossipState_GossipMemberState)
+	members := make(map[string]*GossipMemberState)
 
 	// add ourselves to the gossip list if we are in the members state
 	if member, ok := inf.state.Members[inf.myID]; ok {
@@ -179,7 +179,7 @@ func (inf *Informer) GetMemberStateDelta(targetMemberID string) *MemberStateDelt
 	for memberID, memberState := range members {
 
 		// create an empty state
-		newMemberState := GossipState_GossipMemberState{
+		newMemberState := GossipMemberState{
 			Values: make(map[string]*GossipKeyValue),
 		}
 

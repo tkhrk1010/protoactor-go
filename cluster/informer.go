@@ -4,6 +4,7 @@ package cluster
 
 import (
 	"fmt"
+	"google.golang.org/protobuf/types/known/anypb"
 	"log/slog"
 	"math/rand"
 	"reflect"
@@ -16,7 +17,7 @@ import (
 
 const (
 	TopologyKey       string = "topology"
-	HearthbeatKey     string = "heathbeat"
+	HeartbeatKey      string = "heartbeat"
 	GracefullyLeftKey string = "left"
 )
 
@@ -294,16 +295,44 @@ func (inf *Informer) throttledLog(counter int32) {
 }
 
 func (inf *Informer) SetMapState(stateKey string, mapKey string, value proto.Message) {
-	//TODO implement me
-	panic("implement me")
+	gmap := inf.getGossipMap(stateKey)
+	v, err := anypb.New(value)
+	if err != nil {
+		inf.logger.Error("Failed to create Any", slog.Any("error", err))
+	}
+	gmap.Items[mapKey] = v
+
+	inf.SetState(stateKey, gmap)
 }
 
 func (inf *Informer) RemoveMapState(stateKey string, mapKey string) {
-	//TODO implement me
-	panic("implement me")
+	gmap := inf.getGossipMap(stateKey)
+
+	delete(gmap.Items, mapKey)
+
+	inf.SetState(stateKey, gmap)
 }
 
 func (inf *Informer) GetMapKeys(stateKey string) []string {
-	//TODO implement me
-	panic("implement me")
+	gmap := inf.getGossipMap(stateKey)
+
+	keys := make([]string, 0, len(gmap.Items))
+	for k := range gmap.Items {
+		keys = append(keys, k)
+	}
+
+	return keys
+}
+
+func (inf *Informer) getGossipMap(stateKey string) *GossipMap {
+	s := inf.GetState(stateKey)
+	mys := s[inf.myID]
+	gmap := &GossipMap{}
+	if mys != nil {
+		err := mys.Value.UnmarshalTo(gmap)
+		if err != nil {
+			inf.logger.Error("Failed to unmarshal GossipMap", slog.Any("error", err))
+		}
+	}
+	return gmap
 }

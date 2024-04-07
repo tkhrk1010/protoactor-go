@@ -237,7 +237,7 @@ breakLoop:
 		case <-ticker.C:
 			g.blockExpiredHeartbeats()
 			g.blockGracefullyLeft()
-			g.SetState(HearthbeatKey, &MemberHeartbeat{
+			g.SetState(HeartbeatKey, &MemberHeartbeat{
 				ActorStatistics: &ActorStatistics{
 					ActorCount: g.GetActorCount(),
 				},
@@ -264,7 +264,7 @@ func (g *Gossiper) blockExpiredHeartbeats() {
 	if g.cluster.Config.GossipInterval == 0 {
 		return
 	}
-	t, err := g.GetState(HearthbeatKey)
+	t, err := g.GetState(HeartbeatKey)
 	if err != nil {
 		g.cluster.Logger().Error("Could not get heartbeat state", slog.Any("error", err))
 		return

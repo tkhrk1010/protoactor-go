@@ -133,24 +133,3 @@ message ActorStatistics {
   map<string, int64> actor_count = 1;
 }
 
-// new under dev alpha features
-
-message ClusterReachability {
-  map<string, MemberReachability> reachable = 1;
-}
-
-message MemberReachability {
-  int64 last_contact_timestamp_unix_milliseconds = 1;
-}
-
-message ClusterLeader {
-  string proposed_leader_member_id = 1; // we propose this node becomes leader
-  string elected_leader_member_id = 2; // this is the leader we have elected earlier
-}
-
-
-
-//keys to implement initially
-//topology - value is repeated members, this can replace ClusterTopologyNotification, as it would be the same, but better
-//heartbeat - value is unit, or sender timestamp?
-//leader - value is leader member id

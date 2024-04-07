@@ -38,3 +38,12 @@ message GossipKeyValue {
   google.protobuf.Any value = 4; //value is any format
   int64  local_timestamp_unix_milliseconds = 5;
 }
+
+//special datatype that is known by gossip actor
+//set key
+//remove key
+//get keys
+message GossipMap {
+  map<string, google.protobuf.Any> items = 1;
+}
+

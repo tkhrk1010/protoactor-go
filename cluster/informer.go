@@ -292,3 +292,18 @@ func (inf *Informer) commitPendingOffsets(offsets map[string]int64) {
 func (inf *Informer) throttledLog(counter int32) {
 	inf.logger.Debug("[Gossip] Setting State", slog.Int("throttled", int(counter)))
 }
+
+func (inf *Informer) SetMapState(stateKey string, mapKey string, value proto.Message) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (inf *Informer) RemoveMapState(stateKey string, mapKey string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (inf *Informer) GetMapKeys(stateKey string) []string {
+	//TODO implement me
+	panic("implement me")
+}

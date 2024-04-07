@@ -6,12 +6,12 @@ import (
 
 // Used to query the GossipActor about a given key status
 type GetGossipStateRequest struct {
-	Key string
+	GossipStateKey string
 }
 
 // Create a new GetGossipStateRequest value and return it back
 func NewGetGossipStateRequest(key string) GetGossipStateRequest {
-	request := GetGossipStateRequest{Key: key}
+	request := GetGossipStateRequest{GossipStateKey: key}
 	return request
 }
 
@@ -53,7 +53,7 @@ type GetGossipMapKeysRequest struct {
 
 // Used by the GossipActor to send back the keys in a GossipMap
 type GetGossipMapKeysResponse struct {
-	Keys []string
+	MapKeys []string
 }
 
 // Create a new SetGossipState value with the given data and return it back

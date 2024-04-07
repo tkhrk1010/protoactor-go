@@ -14,6 +14,9 @@ type LocalStateSender func(memberStateDelta *MemberStateDelta, member *Member)
 type GossipStateStorer interface {
 	GetState(key string) map[string]*GossipKeyValue
 	SetState(key string, value proto.Message)
+	SetMapState(stateKey string, mapKey string, value proto.Message)
+	RemoveMapState(stateKey string, mapKey string)
+	GetMapKeys(stateKey string) []string
 }
 
 // This interface must be implemented by any value that

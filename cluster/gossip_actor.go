@@ -46,7 +46,7 @@ func (ga *GossipActor) Receive(ctx actor.Context) {
 	case *actor.Started, *actor.Stopping, *actor.Stopped:
 		// pass
 	case *SetGossipState:
-		ga.onSetGossipStateKey(r, ctx)
+		ga.onSetGossipState(r, ctx)
 	case *SetGossipMapState:
 		ga.onSetGossipMapState(r, ctx)
 	case *RemoveGossipMapState:
@@ -85,7 +85,7 @@ func (ga *GossipActor) onRemoveConsensusCheck(r *RemoveConsensusCheck) {
 }
 
 func (ga *GossipActor) onGetGossipStateKey(r *GetGossipStateRequest, ctx actor.Context) {
-	state := ga.gossip.GetState(r.Key)
+	state := ga.gossip.GetState(r.GossipStateKey)
 	res := NewGetGossipStateResponse(state)
 	ctx.Respond(&res)
 }
@@ -148,7 +148,7 @@ func (ga *GossipActor) onGossipRequest(r *GossipRequest, ctx actor.Context) {
 	//})
 }
 
-func (ga *GossipActor) onSetGossipStateKey(r *SetGossipState, ctx actor.Context) {
+func (ga *GossipActor) onSetGossipState(r *SetGossipState, ctx actor.Context) {
 	key, message := r.GossipStateKey, r.Value
 	ctx.Logger().Debug("Setting GossipState", slog.String("key", key), slog.Any("message", message))
 	ga.gossip.SetState(key, message)
@@ -210,18 +210,16 @@ func (ga *GossipActor) sendGossipForMember(member *Member, memberStateDelta *Mem
 }
 
 func (ga *GossipActor) onSetGossipMapState(r *SetGossipMapState, ctx actor.Context) {
-
+	ga.gossip.SetMapState(r.GossipStateKey, r.MapKey, r.Value)
 }
 
 func (ga *GossipActor) onRemoveGossipMapState(r *RemoveGossipMapState, ctx actor.Context) {
-
+	ga.gossip.RemoveMapState(r.GossipStateKey, r.MapKey)
 }
 
 func (ga *GossipActor) onGetGossipMapKeys(r *GetGossipMapKeysRequest, ctx actor.Context) {
 
-	res := &GetGossipMapKeysResponse{
-		Keys: []string{},
-	}
+	res := ga.gossip.GetMapKeys(r.GossipStateKey)
 
 	ctx.Respond(res)
 }

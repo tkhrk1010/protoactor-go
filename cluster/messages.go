@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // Used to query the GossipActor about a given key status
@@ -38,6 +39,17 @@ type SetGossipMapState struct {
 	GossipStateKey string
 	MapKey         string
 	Value          proto.Message
+}
+
+// Used to query the Gossip State containing GossipMap data type in the GossipActor
+type GetGossipMapStateRequest struct {
+	GossipStateKey string
+	MapKey         string
+}
+
+// Used by the GossipActor to send back the GossipMap value of a given key
+type GetGossipMapStateResponse struct {
+	Value *anypb.Any
 }
 
 // Used to remove Gossip State containing GossipMap data type in the GossipActor

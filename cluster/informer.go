@@ -300,9 +300,17 @@ func (inf *Informer) SetMapState(stateKey string, mapKey string, value proto.Mes
 	if err != nil {
 		inf.logger.Error("Failed to create Any", slog.Any("error", err))
 	}
+
 	gmap.Items[mapKey] = v
 
 	inf.SetState(stateKey, gmap)
+}
+
+func (inf *Informer) GetMapState(stateKey string, mapKey string) *anypb.Any {
+	gmap := inf.getGossipMap(stateKey)
+
+	a := gmap.Items[mapKey]
+	return a
 }
 
 func (inf *Informer) RemoveMapState(stateKey string, mapKey string) {
@@ -328,6 +336,7 @@ func (inf *Informer) getGossipMap(stateKey string) *GossipMap {
 	s := inf.GetState(stateKey)
 	mys := s[inf.myID]
 	gmap := &GossipMap{}
+	gmap.Items = make(map[string]*anypb.Any)
 	if mys != nil {
 		err := mys.Value.UnmarshalTo(gmap)
 		if err != nil {

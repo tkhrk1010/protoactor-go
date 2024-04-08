@@ -9,10 +9,9 @@ require (
 
 replace github.com/asynkron/protoactor-go => ../..
 
-require (
-	github.com/asynkron/protoactor-go v0.0.0-20240406090656-8c90bda12e81
-	github.com/lmittmann/tint v1.0.3
-)
+require github.com/asynkron/protoactor-go v0.0.0-20240408071539-f4cee9b2a813
+
+require github.com/lmittmann/tint v1.0.3
 
 require (
 	github.com/Workiva/go-datastructures v1.1.1 // indirect

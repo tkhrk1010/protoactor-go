@@ -70,7 +70,7 @@ func newGossiper(cl *Cluster, opts ...Option) (*Gossiper, error) {
 
 func (g *Gossiper) GetState(key string) (map[string]*GossipKeyValue, error) {
 	if g.throttler() == actor.Open {
-		g.cluster.Logger().Debug("Gossiper getting state", slog.String("key", key), slog.String("remote", g.pid.String()))
+		g.cluster.Logger().Debug("Gossiper getting state", slog.String("key", key), slog.String("gossipPid", g.pid.String()))
 	}
 
 	msg := NewGetGossipStateRequest(key)
@@ -79,13 +79,13 @@ func (g *Gossiper) GetState(key string) (map[string]*GossipKeyValue, error) {
 	if err != nil {
 		switch err {
 		case actor.ErrTimeout:
-			g.cluster.Logger().Error("Could not get a response from GossipActor: request timeout", slog.Any("error", err), slog.String("remote", g.pid.String()))
+			g.cluster.Logger().Error("Could not get a response from GossipActor: request timeout", slog.Any("error", err), slog.String("gossipPid", g.pid.String()))
 			return nil, err
 		case actor.ErrDeadLetter:
-			g.cluster.Logger().Error("remote no longer exists", slog.Any("error", err), slog.String("remote", g.pid.String()))
+			g.cluster.Logger().Error("remote no longer exists", slog.Any("error", err), slog.String("gossipPid", g.pid.String()))
 			return nil, err
 		default:
-			g.cluster.Logger().Error("Could not get a response from GossipActor", slog.Any("error", err), slog.String("remote", g.pid.String()))
+			g.cluster.Logger().Error("Could not get a response from GossipActor", slog.Any("error", err), slog.String("gossipPid", g.pid.String()))
 			return nil, err
 		}
 	}
@@ -94,7 +94,7 @@ func (g *Gossiper) GetState(key string) (map[string]*GossipKeyValue, error) {
 	response, ok := r.(*GetGossipStateResponse)
 	if !ok {
 		err := fmt.Errorf("could not promote %T interface to GetGossipStateResponse", r)
-		g.cluster.Logger().Error("Could not get a response from GossipActor", slog.Any("error", err), slog.String("remote", g.pid.String()))
+		g.cluster.Logger().Error("Could not get a response from GossipActor", slog.Any("error", err), slog.String("gossipPid", g.pid.String()))
 		return nil, err
 	}
 
@@ -102,23 +102,112 @@ func (g *Gossiper) GetState(key string) (map[string]*GossipKeyValue, error) {
 }
 
 // SetState Sends fire and forget message to update member state
-func (g *Gossiper) SetState(key string, value proto.Message) {
+func (g *Gossiper) SetState(gossipStateKey string, value proto.Message) {
 	if g.throttler() == actor.Open {
-		g.cluster.Logger().Debug("Gossiper setting state", slog.String("key", key), slog.String("remote", g.pid.String()))
+		g.cluster.Logger().Info("Gossiper setting state", slog.String("gossipStateKey", gossipStateKey), slog.String("gossipPid", g.pid.String()))
 	}
 
 	if g.pid == nil {
 		return
 	}
 
-	msg := NewGossipStateKey(key, value)
+	msg := NewGossipStateKey(gossipStateKey, value)
 	g.cluster.ActorSystem.Root.Send(g.pid, &msg)
+}
+
+func (g *Gossiper) SetMapState(gossipStateKey string, mapKey string, value proto.Message) {
+	if g.throttler() == actor.Open {
+		g.cluster.Logger().Info("Gossiper setting map state", slog.String("gossipStateKey", gossipStateKey), slog.String("gossipPid", g.pid.String()))
+	}
+
+	if g.pid == nil {
+		return
+	}
+
+	msg := SetGossipMapState{
+		GossipStateKey: gossipStateKey,
+		MapKey:         mapKey,
+		Value:          value,
+	}
+
+	g.cluster.ActorSystem.Root.Send(g.pid, &msg)
+}
+
+func (g *Gossiper) GetMapState(gossipStateKey string, mapKey string) *anypb.Any {
+	if g.throttler() == actor.Open {
+		g.cluster.Logger().Info("Gossiper setting map state", slog.String("gossipStateKey", gossipStateKey), slog.String("gossipPid", g.pid.String()))
+	}
+
+	msg := GetGossipMapStateRequest{
+		GossipStateKey: gossipStateKey,
+		MapKey:         mapKey,
+	}
+
+	x, err := g.cluster.ActorSystem.Root.RequestFuture(g.pid, &msg, g.cluster.Config.TimeoutTime).Result()
+	if err != nil {
+		g.cluster.Logger().Error("Could not get a response from GossipActor", slog.Any("error", err), slog.String("gossipPid", g.pid.String()))
+		return nil
+	}
+	//cast x to GetGossipMapStateResponse
+	response, ok := x.(*GetGossipMapStateResponse)
+	if !ok {
+		err := fmt.Errorf("could not promote %T interface to GetGossipMapStateResponse", x)
+		g.cluster.Logger().Error("Could not get a response from GossipActor", slog.Any("error", err), slog.String("gossipPid", g.pid.String()))
+		return nil
+	}
+	return response.Value
+}
+
+func (g *Gossiper) RemoveMapState(gossipStateKey string, mapKey string) {
+	if g.throttler() == actor.Open {
+		g.cluster.Logger().Info("Gossiper setting map state", slog.String("gossipStateKey", gossipStateKey), slog.String("gossipPid", g.pid.String()))
+	}
+
+	if g.pid == nil {
+		return
+	}
+
+	msg := RemoveGossipMapState{
+		GossipStateKey: gossipStateKey,
+		MapKey:         mapKey,
+	}
+
+	g.cluster.ActorSystem.Root.Send(g.pid, &msg)
+}
+
+func (g *Gossiper) GetMapKeys(gossipStateKey string) []string {
+	if g.throttler() == actor.Open {
+		g.cluster.Logger().Info("Gossiper setting map state", slog.String("gossipStateKey", gossipStateKey), slog.String("gossipPid", g.pid.String()))
+	}
+
+	if g.pid == nil {
+		return []string{}
+	}
+
+	msg := GetGossipMapKeysRequest{
+		GossipStateKey: gossipStateKey,
+	}
+
+	res, err := g.cluster.ActorSystem.Root.RequestFuture(g.pid, &msg, g.cluster.Config.TimeoutTime).Result()
+
+	if err != nil {
+		g.cluster.Logger().Error("Could not get a response from GossipActor", slog.Any("error", err), slog.String("gossipPid", g.pid.String()))
+		return []string{}
+	}
+	//cast res to GetGossipMapKeysResponse
+	response, ok := res.(*GetGossipMapKeysResponse)
+	if !ok {
+		err := fmt.Errorf("could not promote %T interface to GetGossipMapKeysResponse", res)
+		g.cluster.Logger().Error("Could not get a response from GossipActor", slog.Any("error", err), slog.String("gossipPid", g.pid.String()))
+		return []string{}
+	}
+	return response.MapKeys
 }
 
 // SetStateRequest Sends a Request (that blocks) to update member state
 func (g *Gossiper) SetStateRequest(key string, value proto.Message) error {
 	if g.throttler() == actor.Open {
-		g.cluster.Logger().Debug("Gossiper setting state", slog.String("key", key), slog.String("remote", g.pid.String()))
+		g.cluster.Logger().Debug("Gossiper setting state", slog.String("key", key), slog.String("gossipPid", g.pid.String()))
 	}
 
 	if g.pid == nil {
@@ -129,10 +218,10 @@ func (g *Gossiper) SetStateRequest(key string, value proto.Message) error {
 	r, err := g.cluster.ActorSystem.Root.RequestFuture(g.pid, &msg, g.cluster.Config.TimeoutTime).Result()
 	if err != nil {
 		if err == actor.ErrTimeout {
-			g.cluster.Logger().Error("Could not get a response from Gossiper Actor: request timeout", slog.String("remote", g.pid.String()))
+			g.cluster.Logger().Error("Could not get a response from Gossiper Actor: request timeout", slog.String("gossipPid", g.pid.String()))
 			return err
 		}
-		g.cluster.Logger().Error("Could not get a response from Gossiper Actor", slog.Any("error", err), slog.String("remote", g.pid.String()))
+		g.cluster.Logger().Error("Could not get a response from Gossiper Actor", slog.Any("error", err), slog.String("gossipPid", g.pid.String()))
 		return err
 	}
 
@@ -140,7 +229,7 @@ func (g *Gossiper) SetStateRequest(key string, value proto.Message) error {
 	_, ok := r.(*SetGossipStateResponse)
 	if !ok {
 		err := fmt.Errorf("could not promote %T interface to SetGossipStateResponse", r)
-		g.cluster.Logger().Error("Could not get a response from Gossip Actor", slog.Any("error", err), slog.String("remote", g.pid.String()))
+		g.cluster.Logger().Error("Could not get a response from Gossip Actor", slog.Any("error", err), slog.String("gossipPid", g.pid.String()))
 		return err
 	}
 	return nil
@@ -311,5 +400,5 @@ func (g *Gossiper) blockGracefullyLeft() {
 }
 
 func (g *Gossiper) throttledLog(counter int32) {
-	g.cluster.Logger().Debug("Gossiper Setting State", slog.String("remote", g.pid.String()), slog.Int("throttled", int(counter)))
+	g.cluster.Logger().Debug("Gossiper Setting State", slog.String("gossipPid", g.pid.String()), slog.Int("throttled", int(counter)))
 }

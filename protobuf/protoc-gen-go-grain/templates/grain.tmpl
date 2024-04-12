@@ -46,8 +46,12 @@ type {{ $service.Name }} interface {
 	Terminate(ctx cluster.GrainContext)
 	ReceiveDefault(ctx cluster.GrainContext)
 	{{- range $method := .Methods }}
-	{{ $method.Name }}(*{{ $method.Input }}, cluster.GrainContext) (*{{ $method.Output }}, error)
+	{{ if $method.Options.Reenterable -}}
+	{{ $method.Name }}(req *{{ $method.Input }}, respond func(*{{ $method.Output }}), onError func(error), ctx cluster.GrainContext) error
+	{{- else -}}
+	{{ $method.Name }}(req *{{ $method.Input }}, ctx cluster.GrainContext) (*{{ $method.Output }}, error)
 	{{- end }}
+	{{- end}}
 }
 
 // {{ $service.Name }}GrainClient holds the base data for the {{ $service.Name }}Grain
@@ -56,8 +60,28 @@ type {{ $service.Name }}GrainClient struct {
 	cluster  *cluster.Cluster
 }
 {{ range $method := .Methods}}
+{{ if $method.Options.Future -}}
+// {{ $method.Name }}Future return a future for the execution of {{ $method.Name }} on the cluster
+func (g *{{ $service.Name }}GrainClient) {{ $method.Name }}Future(r *{{ $method.Input }}, opts ...cluster.GrainCallOption) (*actor.Future, error) {
+	bytes, err := proto.Marshal(r)
+	if err != nil {
+		return nil, err
+	}
+
+	reqMsg := &cluster.GrainRequest{MethodIndex: {{ $method.Index }}, MessageData: bytes}
+	f, err := g.cluster.RequestFuture(g.Identity, "{{ $service.Name }}", reqMsg, opts...)
+	if err != nil {
+		return nil, fmt.Errorf("error request future: %w", err)
+	}
+
+	return f, nil
+}
+{{ end }}
 // {{ $method.Name }} requests the execution on to the cluster with CallOptions
 func (g *{{ $service.Name }}GrainClient) {{ $method.Name }}(r *{{ $method.Input }}, opts ...cluster.GrainCallOption) (*{{ $method.Output }}, error) {
+	if g.cluster.Config.RequestLog {
+		g.cluster.Logger().Info("Requesting", slog.String("identity", g.Identity), slog.String("kind", "{{ $service.Name }}"), slog.String("method", "{{ $method.Name }}"), slog.Any("request", r))
+	}
 	bytes, err := proto.Marshal(r)
 	if err != nil {
 		return nil, err
@@ -65,20 +89,18 @@ func (g *{{ $service.Name }}GrainClient) {{ $method.Name }}(r *{{ $method.Input 
 	reqMsg := &cluster.GrainRequest{MethodIndex: {{ $method.Index }}, MessageData: bytes}
 	resp, err := g.cluster.Request(g.Identity, "{{ $service.Name }}", reqMsg, opts...)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error request: %w", err)
 	}
 	switch msg := resp.(type) {
-	case *cluster.GrainResponse:
-		result := &{{ $method.Output }}{}
-		err = proto.Unmarshal(msg.MessageData, result)
-		if err != nil {
-			return nil, err
-		}
-		return result, nil
+	case *{{ $method.Output }}:
+		return msg, nil
 	case *cluster.GrainErrorResponse:
-		return nil, errors.New(msg.Err)
+		if msg == nil {
+			return nil, nil
+		}
+		return nil, msg
 	default:
-		return nil, errors.New("unknown response")
+		return nil, fmt.Errorf("unknown response type %T", resp)
 	}
 }
 {{ end }}
@@ -116,28 +138,36 @@ func (a *{{ $service.Name }}Actor) Receive(ctx actor.Context) {
 			err := proto.Unmarshal(msg.MessageData, req)
 			if err != nil {
 				ctx.Logger().Error("[Grain] {{ $method.Name }}({{ $method.Input }}) proto.Unmarshal failed.", slog.Any("error", err))
-				resp := &cluster.GrainErrorResponse{Err: err.Error()}
+				resp := cluster.NewGrainErrorResponse(cluster.ErrorReason_INVALID_ARGUMENT, err.Error()).
+					WithMetadata(map[string]string{
+						"argument": req.String(),
+				})
 				ctx.Respond(resp)
 				return
 			}
+			{{ if $method.Options.Reenterable -}}
+			err = a.inner.{{ $method.Name }}(req, respond[*{{ $method.Output }}](a.ctx), a.onError, a.ctx)
+			{{ else }}
 			r0, err := a.inner.{{ $method.Name }}(req, a.ctx)
+			{{ end -}}
 			if err != nil {
-				resp := &cluster.GrainErrorResponse{Err: err.Error()}
+				resp := cluster.FromError(err)
 				ctx.Respond(resp)
 				return
 			}
-			bytes, err := proto.Marshal(r0)
-			if err != nil {
-				ctx.Logger().Error("[Grain] {{ $method.Name }}({{ $method.Input }}) proto.Marshal failed", slog.Any("error", err))
-				resp := &cluster.GrainErrorResponse{Err: err.Error()}
-				ctx.Respond(resp)
-				return
-			}
-			resp := &cluster.GrainResponse{MessageData: bytes}
-			ctx.Respond(resp)
+			{{ if not $method.Options.Reenterable -}}
+			ctx.Respond(r0)
+			{{ end -}}
 		{{ end -}}
 		}
 	default:
 		a.inner.ReceiveDefault(a.ctx)
 	}
+}
+
+// onError should be used in ctx.ReenterAfter
+// you can just return error in reenterable method for other errors
+func (a *{{ $service.Name }}Actor) onError(err error) {
+	resp := cluster.FromError(err)
+	a.ctx.Respond(resp)
 }

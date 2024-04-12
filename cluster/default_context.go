@@ -1,4 +1,4 @@
-// Copyright (C) 2017 - 2022 Asynkron.se <http://www.asynkron.se>
+// Copyright (C) 2017 - 2024 Asynkron.se <http://www.asynkron.se>
 
 package cluster
 
@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"reflect"
 	"time"
 
 	"github.com/asynkron/protoactor-go/actor"
@@ -38,7 +39,7 @@ func (dcc *DefaultContext) Request(identity, kind string, message interface{}, o
 	var resp interface{}
 
 	var counter int
-	callConfig := DefaultGrainCallConfig(dcc.cluster)
+	callConfig := NewGrainCallOptions(dcc.cluster)
 	for _, o := range opts {
 		o(callConfig)
 	}
@@ -50,7 +51,7 @@ func (dcc *DefaultContext) Request(identity, kind string, message interface{}, o
 
 	start := time.Now()
 
-	dcc.cluster.Logger().Debug(fmt.Sprintf("Requesting %s:%s Message %#v", identity, kind, message))
+	dcc.cluster.Logger().Debug("Requesting", slog.String("identity", identity), slog.String("kind", kind), slog.String("type", reflect.TypeOf(message).String()), slog.Any("message", message))
 
 	// crate a new Timeout Context
 	ttl := callConfig.Timeout
@@ -67,6 +68,11 @@ selectloop:
 
 			break selectloop
 		default:
+			if counter >= callConfig.RetryCount {
+				err = fmt.Errorf("have reached max retries: %v", callConfig.RetryCount)
+
+				break selectloop
+			}
 			pid := dcc.getPid(identity, kind)
 			if pid == nil {
 				dcc.cluster.Logger().Debug("Requesting PID from IdentityLookup but got nil", slog.String("identity", identity), slog.String("kind", kind))
@@ -74,7 +80,7 @@ selectloop:
 				continue
 			}
 
-			//TODO: why is err != nil when res != nil?
+			// TODO: why is err != nil when res != nil?
 			resp, err = _context.RequestFuture(pid, message, ttl).Result()
 			if resp != nil {
 				break selectloop
@@ -106,13 +112,56 @@ selectloop:
 	return resp, err
 }
 
+func (dcc *DefaultContext) RequestFuture(identity string, kind string, message interface{}, opts ...GrainCallOption) (*actor.Future, error) {
+	var counter int
+	callConfig := DefaultGrainCallConfig(dcc.cluster)
+	for _, o := range opts {
+		o(callConfig)
+	}
+
+	_context := callConfig.Context
+
+	dcc.cluster.Logger().Debug("Requesting future", slog.String("identity", identity), slog.String("kind", kind), slog.String("type", reflect.TypeOf(message).String()), slog.Any("message", message))
+
+	// crate a new Timeout Context
+	ttl := callConfig.Timeout
+
+	ctx, cancel := context.WithTimeout(context.Background(), ttl)
+	defer cancel()
+
+	for {
+		select {
+		case <-ctx.Done():
+			// TODO: handler throttling and messaging here
+			err := fmt.Errorf("request failed: %w", ctx.Err())
+			return nil, err
+		default:
+			if counter >= callConfig.RetryCount {
+				return nil, fmt.Errorf("have reached max retries: %v", callConfig.RetryCount)
+			}
+
+			pid := dcc.getPid(identity, kind)
+			if pid == nil {
+				dcc.cluster.Logger().Debug("Requesting PID from IdentityLookup but got nil", slog.String("identity", identity), slog.String("kind", kind))
+				counter = callConfig.RetryAction(counter)
+				continue
+			}
+
+			f := _context.RequestFuture(pid, message, ttl)
+			return f, nil
+		}
+	}
+}
+
 // gets the cached PID for the given identity
 // it can return nil if none is found.
 func (dcc *DefaultContext) getPid(identity, kind string) *actor.PID {
 	pid, _ := dcc.cluster.PidCache.Get(identity, kind)
 	if pid == nil {
 		pid = dcc.cluster.Get(identity, kind)
-		dcc.cluster.PidCache.Set(identity, kind, pid)
+		if pid != nil {
+			dcc.cluster.PidCache.Set(identity, kind, pid)
+		}
 	}
 
 	return pid

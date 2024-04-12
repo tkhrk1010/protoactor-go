@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"runtime/debug"
 	"sync/atomic"
 	"time"
 
@@ -214,17 +215,13 @@ func (ctx *actorContext) Unwatch(who *PID) {
 }
 
 func (ctx *actorContext) SetReceiveTimeout(d time.Duration) {
-	if d <= 0 {
-		panic("Duration must be greater than zero")
+	if d < time.Millisecond {
+		// anything less than 1 millisecond is set to zero
+		d = 0
 	}
 
 	if d == ctx.receiveTimeout {
 		return
-	}
-
-	if d < time.Millisecond {
-		// anything less than 1 millisecond is set to zero
-		d = 0
 	}
 
 	ctx.receiveTimeout = d
@@ -706,10 +703,10 @@ func (ctx *actorContext) finalizeStop() {
 //
 
 func (ctx *actorContext) EscalateFailure(reason interface{}, message interface{}) {
-	// TODO: add callstack to log?
 	ctx.Logger().Info("[ACTOR] Recovering", slog.Any("self", ctx.self), slog.Any("reason", reason))
 	// debug setting, allows to output supervision failures in console/error level
 	if ctx.actorSystem.Config.DeveloperSupervisionLogging {
+		fmt.Printf("debug.Stack(): %s\n", debug.Stack())
 		fmt.Println("[Supervision] Actor:", ctx.self, " failed with message:", message, " exception:", reason)
 		ctx.Logger().Error("[Supervision]", slog.Any("actor", ctx.self), slog.Any("message", message), slog.Any("exception", reason))
 	}

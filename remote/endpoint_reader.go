@@ -39,6 +39,7 @@ func (s *endpointReader) Receive(stream Remoting_ReceiveServer) error {
 	disconnectChan := make(chan bool, 1)
 	s.remote.edpManager.endpointReaderConnections.Store(stream, disconnectChan)
 	defer func() {
+		s.remote.Logger().Info("EndpointReader is closing")
 		close(disconnectChan)
 	}()
 
@@ -88,6 +89,7 @@ func (s *endpointReader) Receive(stream Remoting_ReceiveServer) error {
 			m := t.MessageBatch
 			err := s.onMessageBatch(m)
 			if err != nil {
+				s.remote.Logger().Error("EndpointReader failed to handle message batch", slog.Any("error", err))
 				return err
 			}
 		default:
@@ -142,7 +144,11 @@ func (s *endpointReader) onMessageBatch(m *MessageBatch) error {
 		// translate from on-the-wire representation to in-process representation
 		// this only applies to root level messages, and never on nested child messages
 		if v, ok := message.(RootSerialized); ok {
-			message = v.Deserialize()
+			message, err = v.Deserialize()
+			if err != nil {
+				s.remote.Logger().Error("EndpointReader failed to deserialize", slog.Any("error", err))
+				return err
+			}
 		}
 
 		switch msg := message.(type) {

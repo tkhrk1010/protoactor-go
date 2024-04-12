@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/asynkron/goconsole v0.0.0-20160504192649-bfa12eebf716
-	google.golang.org/protobuf v1.31.0
+	google.golang.org/protobuf v1.33.0
 )
 
 replace github.com/asynkron/protoactor-go => ../..

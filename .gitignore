@@ -232,7 +232,6 @@ FakesAssemblies/
 # go.work
 /go.work
 /go.work.sum
-/go.sum
 
 .vscode/
 

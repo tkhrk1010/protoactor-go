@@ -59,6 +59,9 @@ func zapAdapterLogging(system *actor.ActorSystem) *slog.Logger {
 
 func main() {
 
+	// NewActorSystemするときにlogの設定を渡せる
+	//coloredConsoleLoggingかjsonLoggingが使いやすそう
+	// 本番ならjsonかな
 	system := actor.NewActorSystem(actor.WithLoggerFactory(coloredConsoleLogging))
 
 	props := actor.PropsFromProducer(func() actor.Actor { return &helloActor{} })

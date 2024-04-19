@@ -120,6 +120,8 @@ func PropsFromProducerWithActorSystem(producer ProducerWithActorSystem, opts ...
 }
 
 // PropsFromFunc creates a props with the given receive func assigned as the actor producer.
+// PropsFromFuncは、actorの挙動を定義する関数を引数に取る
+// PropsFromProducerと違い、actorの型を定義しない
 func PropsFromFunc(f ReceiveFunc, opts ...PropsOption) *Props {
 	p := PropsFromProducer(func() Actor { return f }, opts...)
 

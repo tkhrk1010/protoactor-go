@@ -5,6 +5,9 @@ services:
     image: hashicorp/consul:latest
     networks:
       - consul
+    # -retry-joinは、指定したノードが落ちた場合に自動的に再接続するためのオプション
+    # この場合は、consul-server-bootstrapが落ちた場合に再接続する
+    # -clientは、クライアントのアドレスを指定するオプション
     command: "agent -retry-join consul-server-bootstrap -client 0.0.0.0"
 
   consul-agent-2:
@@ -15,6 +18,8 @@ services:
 
   consul-server-1: &consul-server
     <<: *consul-agent
+    # -serverは、サーバーノードとして起動するためのオプション
+    # サーバーノードは、クラスタのリーダーとしての役割を持つ
     command: "agent -server -retry-join consul-server-bootstrap -client 0.0.0.0"
 
   consul-server-2:
@@ -24,9 +29,12 @@ services:
     <<: *consul-agent
     ports:
       - "8400:8400"
+      # localhost:8500でWebUIにアクセスできるようになってる
       - "8500:8500"
       - "8600:8600"
       - "8600:8600/udp"
+    # -bootstrap-expectは、クラスタのノード数を指定するオプション
+    # -uiは、WebUIを有効にするためのオプション
     command: "agent -server -bootstrap-expect 3 -ui -client 0.0.0.0"
 
   mongodb:
